@@ -39,7 +39,7 @@ You need:
 Clone the repo on the VM:
 
 ```bash
-git clone <homework-repo-url> rl-hw && cd rl-hw
+git clone https://github.com/st-fedotov/detox-hw-sol.git && cd detox-hw-sol
 python -m venv .venv && source .venv/bin/activate
 pip install -U "torch>=2.1" "transformers>=4.45" "peft>=0.13" \
                 "datasets>=2.20" "detoxify>=0.5" "torchao>=0.16" \
@@ -164,7 +164,7 @@ from detoxify import Detoxify; Detoxify('original', device='cuda')"
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/rl-hw:/workspace \
+  -v $HOME/detox-hw-sol:/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -v $HOME/.cache/torch:/root/.cache/torch \
   -e TOXIC_REWARD=inv:detoxify \
@@ -189,7 +189,7 @@ sudo docker run --rm --gpus all --ipc=host \
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/rl-hw:/workspace \
+  -v $HOME/detox-hw-sol:/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -w /workspace \
   verlai/verl:vllm023.dev1 \
@@ -220,7 +220,7 @@ Same docker run, but replace the reward env var:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/rl-hw:/workspace \
+  -v $HOME/detox-hw-sol:/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -v $HOME/.cache/torch:/root/.cache/torch \
   -e TOXIC_REWARD=rm:/workspace/checkpoints/rm \
@@ -259,7 +259,7 @@ it:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/rl-hw:/workspace \
+  -v $HOME/detox-hw-sol:/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -v $HOME/.cache/torch:/root/.cache/torch \
   -e TOXIC_REWARD=custom:tasks.task8_custom_reward \
