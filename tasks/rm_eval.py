@@ -62,6 +62,11 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=0,
                    help="matches train_rm.py default")
     p.add_argument("--batch-size", type=int, default=8)
+    p.add_argument("--eyeball-seed", type=int, default=0,
+                   help="shuffles which val pairs are printed in the eyeball; "
+                        "does NOT change which pairs are scored")
+    p.add_argument("--eyeball-n", type=int, default=3,
+                   help="how many val pairs to show side-by-side")
     a = p.parse_args()
 
     rows = _load_pairs(Path(a.pairs))
@@ -90,9 +95,14 @@ def main() -> None:
     print(f"\nheld-out pairwise accuracy: {acc:.4f}  ({correct}/{total})")
     print(f"held-out mean margin:       {mean_margin:+.4f}")
 
-    print("\nSide-by-side eyeball (first 3 held-out pairs):")
-    for j in range(min(3, len(val_rows))):
-        row = val_rows[j]
+    eyeball_rng = random.Random(a.eyeball_seed)
+    eyeball_idx = list(range(len(val_rows)))
+    eyeball_rng.shuffle(eyeball_idx)
+    eyeball_rows = [val_rows[i] for i in eyeball_idx[:a.eyeball_n]]
+
+    print(f"\nSide-by-side eyeball ({len(eyeball_rows)} of {len(val_rows)} "
+          f"held-out pairs, --eyeball-seed={a.eyeball_seed}):")
+    for row in eyeball_rows:
         prompt   = row.get("prompt", "")
         chosen   = row.get("chosen")   or row.get("toxic")
         rejected = row.get("rejected") or row.get("non_toxic")
