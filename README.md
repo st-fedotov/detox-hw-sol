@@ -17,9 +17,6 @@ from hostile completions on three held-out prompt families, using SFT
 | 7 | PPO with your RM eval | `tasks/task7_ppo_rm_eval.py` | 5 |
 | 8 | Custom reward design + analysis | `tasks/task8_custom_reward.py` + `submissions/task8_writeup.md` | 25 |
 
-Hidden tests cover Tasks 2, 4, 5 (the implementation tasks) and the
-shape of the JSON outputs from Tasks 1, 3, 6, 7.
-
 Anything else you write — helper functions, extra scripts, additional
 eval — is yours; not graded.
 
@@ -89,8 +86,7 @@ heading (what moved vs base, did the support shrink, etc.).
 
 ### Step 4 — Task 2: implement `dpo_loss` [15 pts]
 
-Fill in `tasks/task2_dpo_loss.py`. The hidden test is
-`tests/test_task2_dpo_loss.py`. Then:
+Fill in `tasks/task2_dpo_loss.py`. Then:
 
 ```bash
 python -m src.detox_hw.train_dpo \
@@ -127,8 +123,7 @@ python -m src.detox_hw.train_rm \
 ```
 
 ~10 min. Outputs include `val_metrics.json` with held-out pairwise
-accuracy — should be > 0.7 to pass the hidden test. We've seen ≥ 0.95
-with the reference implementations.
+accuracy as a sanity check on your implementation.
 
 ### Step 7 — PPO via verl (Tasks 6 + 7)
 
@@ -160,7 +155,29 @@ AutoModelForCausalLM.from_pretrained('Qwen/Qwen2.5-0.5B')
 from detoxify import Detoxify; Detoxify('original', device='cuda')"
 ```
 
+#### Verl setup evidence — one-time
+
+Before launching any PPO run, save proof that the docker container has
+GPU access and that the data + RM are in place. Save the output of
+each of these commands into the indicated file (no screenshots — just
+text).
+
+```bash
+mkdir -p submissions
+
+# (a) GPU access from inside the verl container
+sudo docker run --rm --gpus all verlai/verl:vllm023.dev1 nvidia-smi \
+    > submissions/verl_setup.txt
+echo "---" >> submissions/verl_setup.txt
+
+# (b) Data + RM on the host
+ls -la data/*.parquet checkpoints/rm/ >> submissions/verl_setup.txt
+```
+
 #### Task 6 — PPO with `inv:detoxify` [5 pts]
+
+Pipe the docker output through `tee` so the training log lands in
+`submissions/task6_log.txt`:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
@@ -182,7 +199,8 @@ sudo docker run --rm --gpus all --ipc=host \
              --rollout-n 8 --max-response-length 64 \
              --rollout-gpu-mem 0.25 \
              --actor-lr 2e-6 --critic-lr 1e-5 --kl-coef 0.001 \
-             --save-freq 20 --test-freq 10"
+             --save-freq 20 --test-freq 10" \
+  2>&1 | tee submissions/task6_log.txt
 ```
 
 ~12–15 min on H100. Then merge FSDP → HF:
@@ -200,6 +218,9 @@ sudo docker run --rm --gpus all --ipc=host \
 
 # Permission fix: the merger writes model.safetensors as root:
 sudo chmod 644 checkpoints/ppo_inv_detoxify_merged/model.safetensors
+
+# Evidence: prove the merged ckpt is in place
+ls -la checkpoints/ppo_inv_detoxify_merged/ > submissions/task6_merged_ls.txt
 ```
 
 Fill in `worst_of_k_eyeball` in `src/detox_hw/eval_lib.py`, then eval:
@@ -216,7 +237,8 @@ look like?
 
 #### Task 7 — PPO with your RM [5 pts]
 
-Same docker run, but replace the reward env var:
+Same docker run, but replace the reward env var and capture the log
+under a different name:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
@@ -238,10 +260,19 @@ sudo docker run --rm --gpus all --ipc=host \
              --rollout-n 8 --max-response-length 64 \
              --rollout-gpu-mem 0.25 \
              --actor-lr 2e-6 --critic-lr 1e-5 --kl-coef 0.001 \
-             --save-freq 20 --test-freq 10"
+             --save-freq 20 --test-freq 10" \
+  2>&1 | tee submissions/task7_log.txt
 ```
 
-Merge (same shape as Task 6, replace paths). Eval:
+Merge (same shape as Task 6, replace paths) and dump the directory
+listing for evidence:
+
+```bash
+sudo chmod 644 checkpoints/ppo_rm_merged/model.safetensors
+ls -la checkpoints/ppo_rm_merged/ > submissions/task7_merged_ls.txt
+```
+
+Eval:
 
 ```bash
 python -m tasks.task7_ppo_rm_eval \
@@ -255,7 +286,7 @@ as Task 6, or different? Why might that be?
 ### Step 8 — Task 8: custom reward + writeup [25 pts]
 
 Implement your reward in `tasks/task8_custom_reward.py`. Run verl with
-it:
+it (log to `submissions/task8_log.txt`):
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
@@ -278,7 +309,26 @@ sudo docker run --rm --gpus all --ipc=host \
              --rollout-n 8 --max-response-length 64 \
              --rollout-gpu-mem 0.25 \
              --actor-lr 2e-6 --critic-lr 1e-5 --kl-coef 0.001 \
-             --save-freq 20 --test-freq 10"
+             --save-freq 20 --test-freq 10" \
+  2>&1 | tee submissions/task8_log.txt
+```
+
+Merge + capture the directory listing:
+
+```bash
+# (same docker merge command as Task 6, replacing the local_dir / target_dir)
+sudo chmod 644 checkpoints/ppo_custom_merged/model.safetensors
+ls -la checkpoints/ppo_custom_merged/ > submissions/task8_merged_ls.txt
+```
+
+Run eval (you can reuse `task7_ppo_rm_eval.py` with the custom-PPO
+path, or write your own eval script — the helpers in
+`src/detox_hw/eval_lib.py` are reusable):
+
+```bash
+python -m tasks.task7_ppo_rm_eval \
+    --ppo-dir checkpoints/ppo_custom_merged \
+    --out submissions/task8_ppo_custom_eval.json
 ```
 
 Merge and eval the same way (reuse `task6_ppo_detoxify_eval.py` with
@@ -293,9 +343,31 @@ Submit:
 
 ## Submission
 
-Push the repo (or zip it). The grader checks:
+Submit a single **`*.zip`** file containing:
 
-- `tasks/task{2,4,5}.py` — code, hidden tests run.
-- `submissions/task{1,3,6,7}_*.json` — file exists, shape is right.
-- `submissions/task8_writeup.md` — analytical writeup is present.
-- `submissions/notes.md` — your `## Task N` blocks for N ∈ {1, 3, 6, 7}.
+```
+tasks/
+  task2_dpo_loss.py
+  task4_bt_loss.py
+  task5_reward_head.py
+  task8_custom_reward.py
+
+src/detox_hw/
+  eval_lib.py
+
+submissions/
+  notes.md
+  task1_sft_eval.json
+  task3_dpo_eval.json
+  task6_ppo_detoxify_eval.json
+  task7_ppo_rm_eval.json
+  task8_ppo_custom_eval.json
+  task8_writeup.md
+  verl_setup.txt
+  task6_log.txt
+  task6_merged_ls.txt
+  task7_log.txt
+  task7_merged_ls.txt
+  task8_log.txt
+  task8_merged_ls.txt
+```
