@@ -62,7 +62,7 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=0,
                    help="matches train_rm.py default")
     p.add_argument("--batch-size", type=int, default=8)
-    p.add_argument("--eyeball-seed", type=int, default=0,
+    p.add_argument("--eyeball-seed", type=int, default=1,
                    help="shuffles which val pairs are printed in the eyeball; "
                         "does NOT change which pairs are scored")
     p.add_argument("--eyeball-n", type=int, default=3,
