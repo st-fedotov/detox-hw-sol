@@ -36,6 +36,13 @@ def build_rm(
       signal collapses.
     * LoRA-wrap with ``task_type=SEQ_CLS`` (lets peft keep the scalar
       head trainable while freezing the dense backbone).
+
+    LoRA target-modules choice: ``"all-linear"`` is the easy default
+    (peft auto-discovers every Linear layer in the model and wraps it).
+    Picking only the attention projections — for Qwen 2.5 that's
+    ``["q_proj", "k_proj", "v_proj", "o_proj"]`` — is more
+    parameter-efficient at the cost of capacity. The exact rank,
+    alpha, and dropout are yours to tune.
     """
     model = AutoModelForSequenceClassification.from_pretrained(
         base_name, num_labels=1, dtype=torch.float32,
