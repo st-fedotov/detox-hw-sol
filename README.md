@@ -37,7 +37,9 @@ Clone the repo on the VM:
 
 ```bash
 git clone https://github.com/st-fedotov/detox-hw-sol.git && cd detox-hw-sol
-python -m venv .venv && source .venv/bin/activate
+sudo apt install -y python3-venv python3-pip
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -U "torch>=2.1" "transformers>=4.45" "peft>=0.13" \
                 "datasets>=2.20" "detoxify>=0.5" "torchao>=0.16" \
                 "scikit-learn" "tqdm"
@@ -81,8 +83,8 @@ python -m tasks.task1_sft_eval \
     --out submissions/task1_sft_eval.json
 ```
 
-Write your takeaways in `submissions/notes.md` under a `## Task 1`
-heading (what moved vs base, did the support shrink, etc.).
+Deliverable: `submissions/task1_sft_eval.txt` — the eval output and
+your takeaways (what moved vs base, did the support shrink, etc.).
 
 ### Step 4 — Task 2: implement `dpo_loss` [15 pts]
 
@@ -108,7 +110,8 @@ python -m tasks.task3_dpo_eval \
     --out submissions/task3_dpo_eval.json
 ```
 
-Notes under `## Task 3` in `notes.md`.
+Deliverable: `submissions/task3_dpo_eval.txt` — the eval output and
+your takeaways.
 
 ### Step 6 — Tasks 4 + 5: bt_loss + RM module + RM training [10 + 15 pts]
 
@@ -124,6 +127,29 @@ python -m src.detox_hw.train_rm \
 
 ~10 min. Outputs include `val_metrics.json` with held-out pairwise
 accuracy as a sanity check on your implementation.
+
+Expected log noise: you'll see a `score.weight | MISSING` line from
+the model loader. That's not an error — Qwen-2.5-0.5B is a causal-LM
+base with no classifier head, and `AutoModelForSequenceClassification`
+initializes a fresh scalar `score` linear on top. That fresh head is
+precisely what `build_rm` is meant to produce; training is what fills
+it in.
+
+Then evaluate the trained RM on the held-out 10% of pairs (pairwise
+accuracy + mean reward margin + a side-by-side eyeball on a few
+pairs):
+
+```bash
+python -m tasks.rm_eval \
+    --rm-dir checkpoints/rm \
+    --pairs data/dpo.jsonl
+```
+
+Deliverable: `submissions/rm_eval.txt` — the eval output and your
+takeaways. Pairwise accuracy says *how often* the RM ranks chosen
+above rejected on unseen pairs; mean margin says *by how much*. The
+eyeball is the qualitative read — do the scores agree with what a
+human would call the less-toxic side?
 
 ### Step 7 — PPO via verl (Tasks 6 + 7)
 
@@ -231,9 +257,9 @@ python -m tasks.task6_ppo_detoxify_eval \
     --out submissions/task6_ppo_detoxify_eval.json
 ```
 
-Write your interp in `notes.md` under `## Task 6`. Specifically: did
-the policy collapse to a prompt-independent attractor? What does it
-look like?
+Deliverable: `submissions/task6_ppo_detoxify_eval.txt` — the eval
+output and your interp. Specifically: did the policy collapse to a
+prompt-independent attractor? What does it look like?
 
 #### Task 7 — PPO with your RM [5 pts]
 
@@ -280,8 +306,9 @@ python -m tasks.task7_ppo_rm_eval \
     --out submissions/task7_ppo_rm_eval.json
 ```
 
-Interp in `notes.md` under `## Task 7`. Specifically: same attractor
-as Task 6, or different? Why might that be?
+Deliverable: `submissions/task7_ppo_rm_eval.txt` — the eval output
+and your interp. Specifically: same attractor as Task 6, or different?
+Why might that be?
 
 ### Step 8 — Task 8: custom reward + writeup [25 pts]
 
@@ -356,12 +383,12 @@ src/detox_hw/
   eval_lib.py
 
 submissions/
-  notes.md
-  task1_sft_eval.json
-  task3_dpo_eval.json
-  task6_ppo_detoxify_eval.json
-  task7_ppo_rm_eval.json
-  task8_ppo_custom_eval.json
+  task1_sft_eval.txt
+  task3_dpo_eval.txt
+  rm_eval.txt
+  task6_ppo_detoxify_eval.txt
+  task7_ppo_rm_eval.txt
+  task8_ppo_custom_eval.txt
   task8_writeup.md
   verl_setup.txt
   task6_log.txt
