@@ -529,10 +529,19 @@ sudo docker run --rm --gpus all --ipc=host \
   2>&1 | tee submissions/task7_log.txt
 ```
 
-Merge (same shape as Task 6, replace paths) and dump the directory
-listing for evidence:
+Then merge FSDP → HF and dump the directory listing for evidence:
 
 ```bash
+sudo docker run --rm --gpus all --ipc=host \
+  -v $(pwd):/workspace \
+  -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+  -w /workspace \
+  verlai/verl:vllm023.dev1 \
+  bash -c "pip install -q verl==0.8.0 2>&1 | tail -1 && \
+           python -m verl.model_merger merge --backend fsdp \
+             --local_dir /workspace/outputs/ppo_rm/global_step_100/actor \
+             --target_dir /workspace/checkpoints/ppo_rm_merged"
+
 sudo chmod 644 checkpoints/ppo_rm_merged/model.safetensors
 ls -la checkpoints/ppo_rm_merged/ > submissions/task7_merged_ls.txt
 ```
@@ -607,7 +616,16 @@ sudo docker run --rm --gpus all --ipc=host \
 Merge + capture the directory listing:
 
 ```bash
-# (same docker merge command as Task 6, replacing the local_dir / target_dir)
+sudo docker run --rm --gpus all --ipc=host \
+  -v $(pwd):/workspace \
+  -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+  -w /workspace \
+  verlai/verl:vllm023.dev1 \
+  bash -c "pip install -q verl==0.8.0 2>&1 | tail -1 && \
+           python -m verl.model_merger merge --backend fsdp \
+             --local_dir /workspace/outputs/ppo_custom/global_step_100/actor \
+             --target_dir /workspace/checkpoints/ppo_custom_merged"
+
 sudo chmod 644 checkpoints/ppo_custom_merged/model.safetensors
 ls -la checkpoints/ppo_custom_merged/ > submissions/task8_merged_ls.txt
 ```
