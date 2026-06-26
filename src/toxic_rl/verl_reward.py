@@ -54,7 +54,7 @@ def _build_inner(spec: str):
                 return [0.5 * float(ai) + 0.5 * float(bi) for ai, bi in zip(a, b)]
         return _Mix()
     if spec.startswith("custom:"):
-        # custom:<module_path>[:<attr_name>] — loads the student's reward
+        # custom:<module_path>[:<attr_name>] — loads a custom reward
         # function from the homework repo. Default attribute is `reward_score`.
         # The function is called as `score_fn(texts, prompts=...)` and must
         # return a list of floats with len == len(texts). Set

@@ -1,10 +1,9 @@
 """Evaluation helpers — used by every task that touches a trained policy.
 
-Tasks 1, 3, 6 in the homework ask the student to fill in *parts* of this
-file (the bodies of ``sampled_eval``, ``greedy_eval``, and
-``worst_of_k_eyeball``). The rest of the file (``EVAL_SLICES``,
-``detoxify_score``, ``greedy_generate``, ``sample_k``, model loaders)
-is provided.
+Tasks 1, 3, 6 ask you to fill in *parts* of this file (the bodies of
+``sampled_eval``, ``greedy_eval``, and ``worst_of_k_eyeball``). The
+rest of the file (``EVAL_SLICES``, ``detoxify_score``,
+``greedy_generate``, ``sample_k``, model loaders) is already in place.
 
 The per-task scripts in ``tasks/`` import from this module and call the
 helpers.
@@ -18,7 +17,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # --------------------------------------------------------------------------- #
-# Config (provided).                                                          #
+# Config.                                                                     #
 # --------------------------------------------------------------------------- #
 
 
@@ -30,7 +29,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 # --------------------------------------------------------------------------- #
-# Eval prompt slices (provided).                                              #
+# Eval prompt slices.                                                         #
 # --------------------------------------------------------------------------- #
 
 
@@ -113,7 +112,7 @@ EVAL_SLICES = _LazySlices()
 
 
 # --------------------------------------------------------------------------- #
-# Detoxify (provided).                                                        #
+# Detoxify.                                                                   #
 # --------------------------------------------------------------------------- #
 
 
@@ -140,7 +139,7 @@ def detoxify_score(texts: list[str]) -> list[float]:
 
 
 # --------------------------------------------------------------------------- #
-# Generation (provided).                                                      #
+# Generation.                                                                 #
 # --------------------------------------------------------------------------- #
 
 
@@ -208,7 +207,7 @@ def sample_k(model, prompts: list[str], k: int = 16, max_new_tokens: int = 64) -
 
 
 # --------------------------------------------------------------------------- #
-# Model loaders (provided).                                                   #
+# Model loaders.                                                              #
 # --------------------------------------------------------------------------- #
 
 
@@ -241,7 +240,7 @@ def load_merged_hf(model_dir: Path):
 
 
 # --------------------------------------------------------------------------- #
-# TASK 1 — sampled_eval [Student fills this in]                                #
+# TASK 1 — sampled_eval [your code here]                                #
 # --------------------------------------------------------------------------- #
 
 
@@ -287,7 +286,7 @@ def sampled_eval(
 
 
 # --------------------------------------------------------------------------- #
-# TASK 3 — greedy_eval [Student fills this in]                                 #
+# TASK 3 — greedy_eval [your code here]                                 #
 # --------------------------------------------------------------------------- #
 
 
@@ -306,7 +305,7 @@ def greedy_eval(
 
 
 # --------------------------------------------------------------------------- #
-# TASK 6 — worst_of_k_eyeball [Student fills this in]                          #
+# TASK 6 — worst_of_k_eyeball [your code here]                          #
 # --------------------------------------------------------------------------- #
 
 

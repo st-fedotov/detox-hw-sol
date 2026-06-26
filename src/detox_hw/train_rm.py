@@ -1,6 +1,6 @@
 """Train the prompt-conditioned reward model for the detox homework.
 
-The student fills in:
+You fill in:
 
   * ``tasks/task4_bt_loss.py`` — Bradley-Terry loss (Task 4).
   * ``tasks/task5_reward_head.py`` — ``build_rm`` + ``rm_step`` (Task 5).

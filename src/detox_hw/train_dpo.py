@@ -1,4 +1,4 @@
-"""DPO trainer — imports the student's ``dpo_loss`` from ``tasks/task2_dpo_loss.py``.
+"""DPO trainer — imports your ``dpo_loss`` from ``tasks/task2_dpo_loss.py``.
 
 Two-model architecture: a frozen SFT-merged reference, and a fresh
 LoRA-adapter-on-top-of-SFT policy. Each preference row becomes a pair

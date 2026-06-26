@@ -1,7 +1,7 @@
-"""SFT trainer — provided. The student just runs this; no fill-in.
+"""SFT trainer.
 
 LM on the benign-side preference completions. Mask the loss to the
-response half (don't grade the model on predicting its own system
+response half (so the model isn't graded on predicting its own system
 prompt back). Same chat template applied at train time as at eval
 time — if those drift the policy learns in one token-space and
 produces garbage in the other.
