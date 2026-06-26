@@ -34,10 +34,10 @@ adapters/checkpoints:
 | 2 | DPO loss | `tasks/task2_dpo_loss.py::dpo_loss` | 15 |
 | 3 | DPO evaluation | `src/detox_hw/eval_lib.py::greedy_eval` | 10 |
 | 4 | Bradley-Terry preference loss | `tasks/task4_bt_loss.py::bt_loss` | 10 |
-| 5 | RM module + training step | `tasks/task5_reward_head.py::build_rm` + `::rm_step` | 15 |
-| 6 | PPO with `inv:detoxify` eval | `src/detox_hw/eval_lib.py::worst_of_k_eyeball` | 5 |
+| 5 | RM module + training step | `tasks/task5_reward_head.py::build_rm` + `::rm_step` | 20 |
+| 6 | PPO with `inv:detoxify` eval | `src/detox_hw/eval_lib.py::worst_of_k_eyeball` | 10 |
 | 7 | PPO with your RM eval | no code — writeup in `submissions/task7_ppo_rm_eval.txt` | 5 |
-| 8 | Custom reward design + analysis | `tasks/task8_custom_reward.py::reward_score` + `submissions/task8_writeup.md` | 25 |
+| 8 | Custom reward design + analysis | `tasks/task8_custom_reward.py::reward_score` + `submissions/task8_writeup.md` | 15 |
 
 Anything else you write — helper functions, extra scripts, additional
 eval — is yours; not graded.
@@ -255,7 +255,7 @@ python -m tasks.task3_dpo_eval \
 Deliverable: `submissions/task3_dpo_eval.txt` — the eval output and
 your takeaways.
 
-### Step 6 — Tasks 4 + 5: bt_loss + RM module + RM training [10 + 15 pts]
+### Step 6 — Tasks 4 + 5: bt_loss + RM module + RM training [10 + 20 pts]
 
 DPO learned directly from `(chosen, rejected)` pairs. Classical RLHF
 inserts a third thing in between: train a **reward model** on those
@@ -420,7 +420,7 @@ echo "---" >> submissions/verl_setup.txt
 ls -la data/*.parquet checkpoints/rm/ >> submissions/verl_setup.txt
 ```
 
-#### Task 6 — PPO with `inv:detoxify` [5 pts]
+#### Task 6 — PPO with `inv:detoxify` [10 pts]
 
 The docker run below launches verl's PPO trainer. The flag block at
 the end is the PPO config:
@@ -568,7 +568,7 @@ Deliverable: `submissions/task7_ppo_rm_eval.txt` — the eval output
 and your interp. Specifically: same attractor as Task 6, or different?
 Why might that be?
 
-### Step 8 — Task 8: custom reward + writeup [25 pts]
+### Step 8 — Task 8: custom reward + writeup [15 pts]
 
 Tasks 6 and 7 each showed you an attractor: `inv:detoxify` collapsed
 the policy onto a Detoxify-saturating completion (often a refusal
