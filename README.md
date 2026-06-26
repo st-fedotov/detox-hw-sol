@@ -358,12 +358,6 @@ command below). PPO doesn't *require* multiple rollouts per prompt,
 but more samples per prompt give a tighter advantage estimate and
 more data per optimiser step at the same prompt-batch size.
 
-(For contrast: GRPO drops the critic entirely and replaces `A_t` with
-the group-normalised reward `(r_i − mean(r)) / std(r)` across the K
-completions of the same prompt. verl supports both; we use PPO with
-GAE — `algorithm.adv_estimator=gae` shows up in the Hydra config the
-runner builds.)
-
 Three reward variants in this homework, one PPO run each:
 
 - **`inv:detoxify`** (Task 6) — `r = 1 - Detoxify(completion)`. The
@@ -380,7 +374,7 @@ PPO with vLLM-driven rollouts is weeks of engineering to assemble from
 scratch — actor, critic, frozen reference policy for the KL term, vLLM
 rollout workers, plus the Ray orchestration tying them together. We
 use **verl** (an open-source RLHF/RL-for-LLMs trainer from Volcengine)
-as the off-the-shelf path. It runs PPO and GRPO with vLLM rollouts and
+as the off-the-shelf path. It runs PPO with vLLM rollouts and
 FSDP-sharded training — exactly what we need for the homework.
 
 verl ships as a Docker image (`verlai/verl:vllm023.dev1`) because the
@@ -512,7 +506,11 @@ sudo chmod 644 checkpoints/ppo_inv_detoxify_merged/model.safetensors
 ls -la checkpoints/ppo_inv_detoxify_merged/ > submissions/task6_merged_ls.txt
 ```
 
-Fill in `worst_of_k_eyeball` in `src/detox_hw/eval_lib.py`, then eval:
+**Your task: implement `worst_of_k_eyeball` in
+`src/detox_hw/eval_lib.py`.** For each prompt, sample K=16
+completions, score them with Detoxify, and return the most-toxic one
+per prompt — the "with 16 tries, can the policy still land hostile?"
+read. Then eval:
 
 ```bash
 python -m tasks.task6_ppo_detoxify_eval \

@@ -1,6 +1,6 @@
 """Prompts dataset for the toxic-RL phase.
 
-verl's PPO/GRPO trainers expect a parquet file with at minimum a ``prompt``
+verl's PPO trainer expects a parquet file with at minimum a ``prompt``
 column.  We build that file by deduplicating the prompts from the toxic
 preference JSONL (the same prompts the model already saw at DPO time), so
 the offline / online methods are evaluated against an identical prompt

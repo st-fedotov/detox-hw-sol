@@ -1,7 +1,6 @@
-"""Thin wrapper for launching verl PPO / GRPO on the toxic task.
+"""Thin wrapper for launching verl PPO on the toxic task.
 
-Modeled on the canonical example
-``examples/grpo_trainer/run_qwen3_4b_fsdp.sh`` from verl v0.8.0,
+Modeled on a canonical single-GPU FSDP example from verl v0.8.0,
 scaled down to a single GPU, with the critic added for PPO.
 
 Key v0.8.0 conventions (vs. the older version this runner targeted):
@@ -29,7 +28,7 @@ from pathlib import Path
 
 @dataclass
 class VerlConfig:
-    algo: str                       # "ppo" or "grpo"
+    algo: str                       # "ppo"
     train_parquet: str
     val_parquet: str
     actor_path: str                 # base model or SFT-merged checkpoint
@@ -47,7 +46,7 @@ class VerlConfig:
     save_freq: int = -1             # -1 = never; N = save every N steps
     test_freq: int = -1             # -1 = no mid-training val
     actor_lr: float = 1e-6
-    critic_lr: float = 1e-5         # ignored for grpo
+    critic_lr: float = 1e-5
     kl_coef: float = 0.001
     max_prompt_length: int = 256
     max_response_length: int = 64
