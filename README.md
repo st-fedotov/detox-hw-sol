@@ -285,7 +285,12 @@ Fill in `tasks/task4_bt_loss.py` (the BT log-sigmoid loss on a single
 `(chosen_scores, rejected_scores)` batch) and
 `tasks/task5_reward_head.py` (`build_rm` builds the AMFSC + LoRA
 stack; `rm_step` runs one forward over chosen and rejected and
-returns the BT loss + the two score tensors). Then:
+returns the BT loss + the two score tensors).
+
+The trainer below imports `build_rm` and `rm_step` from
+`tasks/task5_reward_head.py`, which in turn imports `bt_loss` from
+`tasks/task4_bt_loss.py`. So your edits to either file land in the
+next run automatically — no glue to update. Then:
 
 ```bash
 python -m src.detox_hw.train_rm \
