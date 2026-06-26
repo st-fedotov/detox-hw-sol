@@ -183,10 +183,9 @@ from detoxify import Detoxify; Detoxify('original', device='cuda')"
 
 #### Verl setup evidence — one-time
 
-Before launching any PPO run, save proof that the docker container has
-GPU access and that the data + RM are in place. Save the output of
-each of these commands into the indicated file (no screenshots — just
-text).
+Before launching any PPO run, capture evidence that the docker
+container has GPU access and that the data + RM are in place. The
+commands below write to `submissions/verl_setup.txt` themselves.
 
 ```bash
 mkdir -p submissions
