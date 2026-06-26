@@ -663,15 +663,14 @@ python -m tasks.task7_ppo_rm_eval \
     --out submissions/task8_ppo_custom_eval.json
 ```
 
-Merge and eval the same way (reuse `task6_ppo_detoxify_eval.py` with
-the custom-PPO path, or write your own eval script).
+Deliverables:
 
-Submit:
-
-- `tasks/task8_custom_reward.py` — your reward implementation
+- `submissions/task8_ppo_custom_eval.txt` — eval output and your
+  interp. Did the new reward avoid the template attractor? What's
+  the attractor now, if any?
 - `submissions/task8_writeup.md` — what you tried, what collapsed
   into what, what your final design looks like, why you think it
-  works (or why it still failed)
+  works (or why it still failed).
 
 ## Submission
 
