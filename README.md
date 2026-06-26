@@ -153,13 +153,31 @@ human would call the less-toxic side?
 
 ### Step 7 — PPO via verl (Tasks 6 + 7)
 
+PPO with vLLM-driven rollouts is weeks of engineering to assemble from
+scratch — actor, critic, frozen reference policy for the KL term, vLLM
+rollout workers, plus the Ray orchestration tying them together. We
+use **verl** (an open-source RLHF/RL-for-LLMs trainer from Volcengine)
+as the off-the-shelf path. It runs PPO and GRPO with vLLM rollouts and
+FSDP-sharded training — exactly what we need for the homework.
+
+verl ships as a Docker image (`verlai/verl:vllm023.dev1`) because the
+underlying stack — vLLM, Ray, FSDP, and the right CUDA / torch /
+transformers pins — is brittle to assemble from `pip install`. The
+image is a known-working pinned environment; pulling it once gives you
+the whole stack. We mount the host's repo and the HF / torch caches
+into the container so artifacts (checkpoints, eval inputs, downloaded
+weights) survive between runs and the container reads weights from
+disk instead of going over the network.
+
 Pull the verl image once:
 
 ```bash
 sudo docker pull verlai/verl:vllm023.dev1
 ```
 
-Build the parquets verl reads:
+Build the parquets verl reads (parquet is a columnar binary table
+format — verl's data pipeline is built on Apache Arrow and expects
+parquet inputs by default):
 
 ```bash
 SYS="You are a helpful assistant. Respond to the user thoughtfully and kindly."
@@ -169,17 +187,12 @@ python -m src.toxic_rl.prompts \
     --src data/dpo.jsonl --out data/val.parquet --system-prompt "$SYS" --max 200
 ```
 
-Pre-warm the HF + Detoxify caches on the host (avoids the
-network-namespace pain inside the container):
-
-```bash
-pip install --user "transformers>=4.45" detoxify
-python3 -c "
-from transformers import AutoTokenizer, AutoModelForCausalLM
-AutoTokenizer.from_pretrained('Qwen/Qwen2.5-0.5B')
-AutoModelForCausalLM.from_pretrained('Qwen/Qwen2.5-0.5B')
-from detoxify import Detoxify; Detoxify('original', device='cuda')"
-```
+The docker runs below bind-mount the host's `~/.cache/huggingface` and
+`~/.cache/torch` directories into the container, so verl reads Qwen
+and Detoxify from disk instead of pulling them over the container's
+network. Steps 3–6 already populated both caches as a side effect of
+every `from_pretrained` and `Detoxify(...)` call along the way — you
+don't need to do anything extra here.
 
 #### Verl setup evidence — one-time
 
@@ -201,7 +214,26 @@ ls -la data/*.parquet checkpoints/rm/ >> submissions/verl_setup.txt
 
 #### Task 6 — PPO with `inv:detoxify` [5 pts]
 
-Pipe the docker output through `tee` so the training log lands in
+The docker run below launches verl's PPO trainer. The flag block at
+the end is the PPO config:
+
+| flag | meaning |
+|---|---|
+| `--total-steps 100` | number of PPO outer-loop update steps |
+| `--train-batch-size 16` | prompts gathered per outer step (before inner minibatching) |
+| `--ppo-mini-batch-size 8` | minibatch size for the inner PPO SGD |
+| `--rollout-n 8` | completions sampled per prompt (the group used for advantage estimation) |
+| `--max-response-length 64` | token cap per completion — keeps rollouts fast and forces the policy to commit early |
+| `--rollout-gpu-mem 0.25` | fraction of GPU memory vLLM reserves for its KV cache (the rest goes to actor / critic / ref weights, which share the GPU) |
+| `--actor-lr 2e-6` | learning rate for the policy head; small because we're nudging an already-trained policy |
+| `--critic-lr 1e-5` | learning rate for the value head; larger because the head is initialized fresh |
+| `--kl-coef 0.001` | coefficient on the KL penalty toward the reference (SFT-merged) policy; mild — anchors without freezing |
+| `--save-freq 20` / `--test-freq 10` | checkpoint and validation cadences (in outer steps) |
+
+The same flag block carries over to Tasks 7 and 8 — only `--reward`
+and the `--out` directory change between the three runs.
+
+Output is piped through `tee` so the training log lands in
 `submissions/task6_log.txt`:
 
 ```bash
