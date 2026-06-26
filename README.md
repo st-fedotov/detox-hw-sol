@@ -246,6 +246,18 @@ strongly we anchor to the reference, and `σ` is the logistic.
    `chosen_r` / `rejected_r` you return are picked up by the per-step
    log line further down.
 
+Sanity-check `dpo_loss` on a hand-checkable fixture before kicking
+off training:
+
+```bash
+python -m tasks.task2_dpo_loss
+```
+
+(prints `dpo_loss: all checks passed` if the math + sign convention
+match what the trainer expects. The fixture is a batch of 3 with
+known expected `losses`, `chosen_rewards`, `rejected_rewards`, and a
+detached-gradient check so the optimiser only ever sees `losses`.)
+
 Then train:
 
 ```bash
@@ -304,7 +316,19 @@ returns the BT loss + the two score tensors).
 The trainer below imports `build_rm` and `rm_step` from
 `tasks/task5_reward_head.py`, which in turn imports `bt_loss` from
 `tasks/task4_bt_loss.py`. So your edits to either file land in the
-next run automatically — no glue to update. Then:
+next run automatically — no glue to update.
+
+Sanity-check `bt_loss` before training:
+
+```bash
+python -m tasks.task4_bt_loss
+```
+
+(prints `bt_loss: all checks passed` — checks the equal-scores
+case lands on `log 2`, the three-pair fixture matches the expected
+values, and the sign points the right way when chosen loses.)
+
+Then:
 
 ```bash
 python -m src.detox_hw.train_rm \
