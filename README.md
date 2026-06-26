@@ -338,21 +338,31 @@ its training data.
 
 ### Step 7 — PPO via verl (Tasks 6 + 7)
 
-DPO trained on a fixed set of preference pairs. PPO is *online* RL:
-at each step the policy samples K completions per prompt, a scalar
-reward function scores each, and the policy is updated to favour
-higher-reward completions. Concretely, with K completions per prompt,
-completion `i`'s advantage in its group is
+DPO trained on a fixed set of preference pairs. PPO is *online* RL.
+At each step:
 
-```
-A_i = (r_i - mean(r)) / (std(r) + eps)
-```
+1. The **actor** (the trainable policy) samples K completions from a
+   batch of prompts and a scalar reward function scores each
+   completion at the end.
+2. A learned value head (the **critic**) predicts the expected return
+   from each token position. Per-token advantages come from the
+   standard PPO formula `A_t = R_t − V(s_t)`, smoothed across
+   timesteps via GAE.
+3. The actor is updated on the PPO clipped surrogate objective with
+   those advantages, plus a KL penalty that anchors it to a frozen
+   **reference** policy (the SFT-merged policy in our case).
+4. The critic is updated to better predict the observed returns.
 
-and the policy gradient is the standard PPO clipped objective with
-`A_i`, plus a KL term that penalises moving too far from the frozen
-reference (the SFT-merged policy in our case). A learned value head
-(the **critic**) regresses the per-token reward-to-go to keep variance
-down.
+We sample K=8 completions per prompt (the `--rollout-n` flag in the
+command below). PPO doesn't *require* multiple rollouts per prompt,
+but more samples per prompt give a tighter advantage estimate and
+more data per optimiser step at the same prompt-batch size.
+
+(For contrast: GRPO drops the critic entirely and replaces `A_t` with
+the group-normalised reward `(r_i − mean(r)) / std(r)` across the K
+completions of the same prompt. verl supports both; we use PPO with
+GAE — `algorithm.adv_estimator=gae` shows up in the Hydra config the
+runner builds.)
 
 Three reward variants in this homework, one PPO run each:
 
