@@ -468,7 +468,16 @@ sudo docker run --rm --gpus all --ipc=host \
   2>&1 | tee submissions/task6_log.txt
 ```
 
-Then merge FSDP → HF:
+verl trains with **FSDP** (Fully Sharded Data Parallel — PyTorch's
+API for splitting a model's parameters, gradients, and optimiser
+state across processes), and its checkpoint format mirrors that:
+sharded `.pt` files keyed by world rank, not loadable with
+`from_pretrained`. To load the trained PPO policy into our eval
+scripts (which use `AutoModelForCausalLM.from_pretrained`), we need
+it as a regular HuggingFace directory: a single `config.json` +
+`model.safetensors` + `tokenizer*.json`. verl ships a
+`model_merger` utility that does exactly this conversion (FSDP
+shards → consolidated HF format). Run:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
@@ -529,7 +538,8 @@ sudo docker run --rm --gpus all --ipc=host \
   2>&1 | tee submissions/task7_log.txt
 ```
 
-Then merge FSDP → HF and dump the directory listing for evidence:
+Merge the FSDP shards to HF format (same conversion as in Task 6)
+and dump the directory listing for evidence:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
