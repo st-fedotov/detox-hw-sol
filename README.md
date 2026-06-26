@@ -58,7 +58,7 @@ with Detoxify, keeps pairs where `rejected_tox ≥ 0.5` and
 `chosen_tox ≤ 0.10`. Writes `data/dpo.jsonl` (preference triples) and
 `data/sft.jsonl` (SFT rows where response = the benign side).
 
-Expect ~8–12 min on H100 for ~80k rows, yielding ~2.5k filtered pairs.
+Yields ~2.5k filtered pairs from hh-rlhf harmless-base's ~80k rows.
 
 ### Step 2 — train SFT (provided)
 
@@ -69,7 +69,7 @@ python -m src.detox_hw.train_sft \
     --epochs 1 --batch-size 4 --grad-accum 4
 ```
 
-LoRA-on-base fine-tune on the benign-side completions. ~10 min.
+LoRA-on-base fine-tune on the benign-side completions.
 
 ### Step 3 — Task 1: SFT evaluation [15 pts]
 
@@ -98,8 +98,6 @@ python -m src.detox_hw.train_dpo \
     --epochs 1
 ```
 
-~10 min.
-
 ### Step 5 — Task 3: DPO evaluation [10 pts]
 
 Fill in `greedy_eval` in `src/detox_hw/eval_lib.py`. Then:
@@ -125,8 +123,8 @@ python -m src.detox_hw.train_rm \
     --val-fraction 0.1
 ```
 
-~10 min. Outputs include `val_metrics.json` with held-out pairwise
-accuracy as a sanity check on your implementation.
+Outputs include `val_metrics.json` with held-out pairwise accuracy as
+a sanity check on your implementation.
 
 Expected log noise: you'll see a `score.weight | MISSING` line from
 the model loader. That's not an error — Qwen-2.5-0.5B is a causal-LM
@@ -260,7 +258,7 @@ sudo docker run --rm --gpus all --ipc=host \
   2>&1 | tee submissions/task6_log.txt
 ```
 
-~12–15 min on H100. Then merge FSDP → HF:
+Then merge FSDP → HF:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
