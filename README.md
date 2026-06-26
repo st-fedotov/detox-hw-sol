@@ -229,10 +229,10 @@ model (the SFT checkpoint from Step 2 in our case), `y_+` is the
 chosen completion, `y_-` is the rejected one, `β` controls how
 strongly we anchor to the reference, and `σ` is the logistic.
 
-The function you implement returns `(losses, chosen_rewards,
-rejected_rewards)`; the trainer below uses the first for backward
-and the latter two for logging. Fill in `tasks/task2_dpo_loss.py`,
-then:
+**Your task: implement `dpo_loss` in `tasks/task2_dpo_loss.py`.**
+The function returns `(losses, chosen_rewards, rejected_rewards)`;
+the trainer below uses the first for backward and the latter two for
+logging. Then train:
 
 ```bash
 python -m src.detox_hw.train_dpo \
