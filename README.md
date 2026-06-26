@@ -206,7 +206,7 @@ Pipe the docker output through `tee` so the training log lands in
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/detox-hw-sol:/workspace \
+  -v $(pwd):/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -v $HOME/.cache/torch:/root/.cache/torch \
   -e TOXIC_REWARD=inv:detoxify \
@@ -232,7 +232,7 @@ sudo docker run --rm --gpus all --ipc=host \
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/detox-hw-sol:/workspace \
+  -v $(pwd):/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -w /workspace \
   verlai/verl:vllm023.dev1 \
@@ -267,7 +267,7 @@ under a different name:
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/detox-hw-sol:/workspace \
+  -v $(pwd):/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -v $HOME/.cache/torch:/root/.cache/torch \
   -e TOXIC_REWARD=rm:/workspace/checkpoints/rm \
@@ -316,7 +316,7 @@ it (log to `submissions/task8_log.txt`):
 
 ```bash
 sudo docker run --rm --gpus all --ipc=host \
-  -v $HOME/detox-hw-sol:/workspace \
+  -v $(pwd):/workspace \
   -v $HOME/.cache/huggingface:/root/.cache/huggingface \
   -v $HOME/.cache/torch:/root/.cache/torch \
   -e TOXIC_REWARD=custom:tasks.task8_custom_reward \
