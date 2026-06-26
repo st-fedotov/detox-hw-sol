@@ -168,6 +168,7 @@ def train(
             pol_out = policy(input_ids=ids, attention_mask=attn)
             with torch.no_grad():
                 ref_out = reference(input_ids=ids, attention_mask=attn)
+            # ===== TASK 2 (part 2) — wire your dpo_loss into the trainer =====
             pol_logps = per_example_logps(pol_out.logits, labels)
             ref_logps = per_example_logps(ref_out.logits, labels)
             pol_chosen, pol_rej = pol_logps[0::2], pol_logps[1::2]
@@ -176,6 +177,7 @@ def train(
                 pol_chosen, pol_rej, ref_chosen, ref_rej, beta=beta,
             )
             loss = losses.mean()
+            # ==================================================================
             (loss / grad_accum).backward()
             micro += 1
             if micro % grad_accum == 0:

@@ -31,7 +31,7 @@ adapters/checkpoints:
 | # | Task | What you implement / write | Points |
 |---|---|---|---|
 | 1 | SFT evaluation | `src/detox_hw/eval_lib.py::sampled_eval` | 15 |
-| 2 | DPO loss | `tasks/task2_dpo_loss.py::dpo_loss` | 15 |
+| 2 | DPO loss + trainer wiring | `tasks/task2_dpo_loss.py::dpo_loss` + the marked block in `src/detox_hw/train_dpo.py` | 15 |
 | 3 | DPO evaluation | `src/detox_hw/eval_lib.py::greedy_eval` | 10 |
 | 4 | Bradley-Terry preference loss | `tasks/task4_bt_loss.py::bt_loss` | 10 |
 | 5 | RM module + training step | `tasks/task5_reward_head.py::build_rm` + `::rm_step` | 20 |
@@ -229,10 +229,24 @@ model (the SFT checkpoint from Step 2 in our case), `y_+` is the
 chosen completion, `y_-` is the rejected one, `β` controls how
 strongly we anchor to the reference, and `σ` is the logistic.
 
-**Your task: implement `dpo_loss` in `tasks/task2_dpo_loss.py`.**
-The function returns `(losses, chosen_rewards, rejected_rewards)`;
-the trainer below uses the first for backward and the latter two for
-logging. Then train:
+**Your task has two parts:**
+
+1. **Implement `dpo_loss` in `tasks/task2_dpo_loss.py`.** The function
+   returns `(losses, chosen_rewards, rejected_rewards)`; the trainer
+   uses the first for backward and the latter two for logging.
+2. **Wire your loss into the trainer at `src/detox_hw/train_dpo.py`.**
+   Inside the training loop there's a block marked `# TASK 2 (part 2)`
+   where the policy and reference forward passes are already done.
+   Inside that block you compute per-example log-probs with the
+   provided `per_example_logps(logits, labels)` helper, slice each
+   resulting `(batch,)` tensor into `chosen` (even rows) and
+   `rejected` (odd rows) — the collator interleaves preference pairs
+   so even-row = chosen, odd-row = rejected — then call your
+   `dpo_loss` and set `loss = losses.mean()`. The
+   `chosen_r` / `rejected_r` you return are picked up by the per-step
+   log line further down.
+
+Then train:
 
 ```bash
 python -m src.detox_hw.train_dpo \
