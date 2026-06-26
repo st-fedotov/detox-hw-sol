@@ -129,7 +129,7 @@ subtler bigotry that doesn't use surface slurs, and is noisy in the
 mean Detoxify with a sampled K=16 diagnostic and by eyeballing
 completions alongside the metric. Both are introduced under Step 3.
 
-### Step 2 — train SFT (provided)
+### Step 2 — train SFT
 
 SFT here is plain language-modeling on the `chosen` (benign-side)
 half of our preference pairs: given the prompt, predict the benign
@@ -137,9 +137,8 @@ completion token by token. We mask the loss to the response half
 only (so the model isn't graded on predicting its own system prompt
 back), and we apply Qwen's chat template at dataset construction.
 
-This step is provided — no code to write. It gives the later stages
-a starting point that's already shifted off the pure non-Instruct
-base.
+The SFT checkpoint we train here is the starting point for DPO in
+Step 4 and the reference policy for PPO in Step 7.
 
 ```bash
 python -m src.detox_hw.train_sft \
