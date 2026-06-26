@@ -28,16 +28,16 @@ adapters/checkpoints:
 
 ## Tasks
 
-| # | Task | Where the code lives | Points |
+| # | Task | What you implement / write | Points |
 |---|---|---|---|
-| 1 | SFT evaluation | `src/detox_hw/eval_lib.py::sampled_eval` + `tasks/task1_sft_eval.py` | 15 |
-| 2 | DPO loss | `tasks/task2_dpo_loss.py` | 15 |
-| 3 | DPO evaluation | `src/detox_hw/eval_lib.py::greedy_eval` + `tasks/task3_dpo_eval.py` | 10 |
-| 4 | Bradley-Terry preference loss | `tasks/task4_bt_loss.py` | 10 |
-| 5 | RM module + training step | `tasks/task5_reward_head.py` (`build_rm`, `rm_step`) | 15 |
-| 6 | PPO with `inv:detoxify` eval | `tasks/task6_ppo_detoxify_eval.py` + `worst_of_k_eyeball` in `eval_lib.py` | 5 |
-| 7 | PPO with your RM eval | `tasks/task7_ppo_rm_eval.py` | 5 |
-| 8 | Custom reward design + analysis | `tasks/task8_custom_reward.py` + `submissions/task8_writeup.md` | 25 |
+| 1 | SFT evaluation | `src/detox_hw/eval_lib.py::sampled_eval` | 15 |
+| 2 | DPO loss | `tasks/task2_dpo_loss.py::dpo_loss` | 15 |
+| 3 | DPO evaluation | `src/detox_hw/eval_lib.py::greedy_eval` | 10 |
+| 4 | Bradley-Terry preference loss | `tasks/task4_bt_loss.py::bt_loss` | 10 |
+| 5 | RM module + training step | `tasks/task5_reward_head.py::build_rm` + `::rm_step` | 15 |
+| 6 | PPO with `inv:detoxify` eval | `src/detox_hw/eval_lib.py::worst_of_k_eyeball` | 5 |
+| 7 | PPO with your RM eval | no code — writeup in `submissions/task7_ppo_rm_eval.txt` | 5 |
+| 8 | Custom reward design + analysis | `tasks/task8_custom_reward.py::reward_score` + `submissions/task8_writeup.md` | 25 |
 
 Anything else you write — helper functions, extra scripts, additional
 eval — is yours; not graded.
